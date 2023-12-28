@@ -1,15 +1,20 @@
+import React from 'react';
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { loginUser, clearState } from "./auth.slice";
 import { ToastContainer, toast } from "react-toastify";
+import {useCounter} from './useCounter';
 import "react-toastify/dist/ReactToastify.css";
+import './login.css'
 
 export function Login() {
   const [user, setUser] = useState({
     username: "",
     password: "",
   });
+
+  const [checked, setChecked] = React.useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -43,8 +48,18 @@ export function Login() {
     }
   });
 
+  const {count, setCount} = useCounter();
+  const [leftNavState, setLefNavState] = React.useState('');
+  const leftNavClassName = "left_nav " + leftNavState;
+
+  const [isPasswordShown, setIsPasswordShown] = React.useState(false);
+  console.log('checked', checked)
+  
   return (
     <div className="container-fluid ps-md-0">
+      <div className={leftNavClassName}>
+        Lef Nav
+      </div>
       <div className="row g-0">
         <div className="d-none d-md-flex col-md-4 col-lg-6 bg-image"></div>
         <div className="col-md-8 col-lg-6">
@@ -52,7 +67,18 @@ export function Login() {
             <div className="container">
               <div className="row">
                 <div className="col-md-9 col-lg-8 mx-auto">
+                  <button onClick={() => {
+                    setLefNavState('hidden')
+                  }}>hide nav</button>
                   <ToastContainer />
+                  <div>{count}</div>
+                  <button
+                    onClick={() => {
+                      setCount(prev => prev + 1, console.log('test'))
+                    }}
+                  >
+                    add
+                  </button>
                   <h3 className="login-heading mb-4">Welcome back!</h3>
                   <form onSubmit={onSubmitLogin}>
                     <div className="form-floating mb-3">
@@ -69,7 +95,7 @@ export function Login() {
                     </div>
                     <div className="form-floating mb-3">
                       <input
-                        type="password"
+                        type={isPasswordShown ? "text" : "password"}
                         className="form-control"
                         id="floatingPassword"
                         placeholder="Password"
@@ -77,6 +103,15 @@ export function Login() {
                         value={user.password}
                         onChange={onChangeInput}
                       />
+                      <div
+                      className="password_display_toggle"
+                      onClick={() => setIsPasswordShown(
+                        prevState => {
+                          return !prevState
+                        }
+                      )
+
+                      }>{isPasswordShown ? 'hide' : 'show'}</div>
                       <label htmlFor="floatingPassword">Password</label>
                     </div>
 
@@ -84,7 +119,13 @@ export function Login() {
                       <input
                         className="form-check-input"
                         type="checkbox"
+                        checked={checked}
                         id="rememberPasswordCheck"
+                        onChange={() => {
+                          setChecked(prevState => {
+                            return !prevState
+                          })
+                        }}
                       />
                       <label
                         className="form-check-label"
